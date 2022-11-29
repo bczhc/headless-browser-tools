@@ -1,0 +1,13 @@
+{
+  "name": "headless-browser",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+  },
+  "author": "",
+  "type": "module",
+  "dependencies": {
+    "puppeteer-core": "^19.3.0"
+  }
+}
