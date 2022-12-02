@@ -16,7 +16,7 @@ let url = 'http://ehall.ccit.js.cn/ywtb-portal/standard/index.html?browser=no#/o
 async function launchBrowser() {
     return await puppeteer.launch({
         executablePath: '/usr/bin/chromium',
-        headless: false,
+        headless: true,
         args: ['--no-proxy-server', '--disable-gpu', '--no-sandbox']
     });
 }
@@ -91,4 +91,4 @@ let fetched = await newPage.evaluate(() => {
 
 await browser.close();
 
-console.log(fetched);
+console.log(JSON.stringify(fetched));
