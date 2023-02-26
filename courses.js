@@ -64,7 +64,7 @@ let fetched = []
 page.on('response', response => {
     if (response.url().includes('queryTimetable.do')) {
         response.json().then(x => {
-            console.log("Push...")
+            console.error("Received response");
             fetched.push(x)
         })
     }
