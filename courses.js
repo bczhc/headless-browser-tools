@@ -15,7 +15,7 @@ async function asyncSleep(millis) {
 async function launchBrowser() {
     return await puppeteer.launch({
         executablePath: '/usr/bin/chromium',
-        headless: false,
+        headless: HEADLESS,
         args: ['--no-proxy-server', '--disable-gpu', '--no-sandbox']
     });
 }
