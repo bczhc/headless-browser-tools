@@ -2,6 +2,7 @@ import puppeteer from "puppeteer-core";
 
 let USERNAME;
 let PASSWORD;
+let HEADLESS = true;
 
 async function asyncSleep(millis) {
     return new Promise(resolve => {
@@ -16,7 +17,7 @@ let url = 'http://ehall.ccit.js.cn/ywtb-portal/standard/index.html?browser=no#/h
 async function launchBrowser() {
     return await puppeteer.launch({
         executablePath: '/usr/bin/chromium',
-        headless: false,
+        headless: HEADLESS,
         args: ['--no-proxy-server', '--disable-gpu', '--no-sandbox']
     });
 }
@@ -45,11 +46,14 @@ async function login(page) {
 
 let argv = process.argv.slice(2);
 if (argv.length === 0) {
-    console.log('Usage: command <username> <password>');
+    console.log('Usage: command <username> <password> <headless-flag>');
     process.exit(1);
 }
 USERNAME = argv[0];
-PASSWORD = argv[1].trimEnd();
+PASSWORD = argv[1];
+if (argv[2] === 'false') {
+    HEADLESS = false;
+}
 
 
 let browser = await launchBrowser();
