@@ -75,16 +75,16 @@ let fetched = await newPage.evaluate(() => {
     let books = Array.from($('#mylib_content > table > tbody').children()).slice(1).map(x => {
         let title = $(x.children[1]).text();
         let borrowDate = $(x.children[2]).text();
-        let returnDate = $(x.children[3]).text();
+        let dueDate = $(x.children[3]).text();
         return {
             title: title.trim(),
             borrowDate: borrowDate.trim(),
-            returnDate: returnDate.trim(),
+            dueDate: dueDate.trim(),
         };
     })
     return {
-        borrowCount: bookCount,
-        totalBorrowCount: borrowLimit,
+        bookCount: bookCount,
+        borrowLimit: borrowLimit,
         books: books
     }
 });
