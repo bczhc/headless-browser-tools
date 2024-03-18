@@ -1,5 +1,6 @@
 import puppeteer from "puppeteer-core";
 import fs from 'fs';
+import net from 'net';
 
 // 文件路径
 const filePath = '/tmp/btc-price';
@@ -34,6 +35,37 @@ function updateFileContent(newContent) {
     });
 }
 
+function createServer(onCreated) {
+    let writeHandler = [null]
+
+    // Create a TCP server
+    const server = net.createServer(socket => {
+        console.log('Client connected');
+
+        writeHandler[0] = (line) => {
+            socket.write(line + "\n");
+        };
+
+        // Handle client disconnection
+        socket.on('end', () => {
+            console.log('Client disconnected');
+        });
+
+        // Handle errors
+        socket.on('error', (err) => {
+            console.error('Socket error:', err.message);
+        });
+    });
+
+// Listen for connections on port 3000
+    const PORT = 3456;
+    server.listen(PORT, () => {
+        console.log(`Server listening on port ${PORT}`);
+
+        onCreated(writeHandler);
+    });
+}
+
 async function launchBrowser(args) {
     return await puppeteer.launch({
         executablePath: '/usr/bin/chromium',
@@ -43,25 +75,30 @@ async function launchBrowser(args) {
 }
 
 let registerOnConsoleListener = (page) => {
-    page.on('console', async log => {
-        console.log("Console message: " + log.args()[0]);
-        try {
-            console.log(await log.args()[0].jsonValue());
-        } catch (e) {
-            console.error(e);
-        }
-
-        try {
-            let json = await log.args()[0].jsonValue();
-            if (json['tag'] === 'btc-price') {
-                let price = parseFloat(json['value'].replace(',', ''));
-                console.log('price: ' + price);
-                updateFileContent(price.toString())
+    createServer(writeLineWrapper => {
+        page.on('console', async log => {
+            console.log("Console message: " + log.args()[0]);
+            try {
+                console.log(await log.args()[0].jsonValue());
+            } catch (e) {
+                console.error(e);
             }
-        } catch (e) {
-            console.error(e);
-        }
-    })
+
+            try {
+                let json = await log.args()[0].jsonValue();
+                if (json['tag'] === 'btc-price') {
+                    let price = parseFloat(json['value'].replace(',', ''));
+                    console.log('price: ' + price);
+                    updateFileContent(price.toString())
+                    if (writeLineWrapper[0] != null) {
+                        writeLineWrapper[0](price.toString());
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        })
+    });
 }
 
 (async () => {
