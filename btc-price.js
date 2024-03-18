@@ -44,6 +44,7 @@ async function launchBrowser(args) {
 
 let registerOnConsoleListener = (page) => {
     page.on('console', async log => {
+        console.log("Console message: " + log.args()[0]);
         try {
             console.log(await log.args()[0].jsonValue());
         } catch (e) {
@@ -68,13 +69,15 @@ let registerOnConsoleListener = (page) => {
 
     let defaultPage = (await browser.pages())[0];
     registerOnConsoleListener(defaultPage);
-    await defaultPage.goto('https://www.binance.com/en/trade/BTC_USDT?_from=markets&type=spot');
-    await defaultPage.waitForSelector('.showPrice');
+    await defaultPage.goto('https://www.binance.com/zh-CN/futures/BTCUSDT');
+    await defaultPage.waitForSelector('.contractPrice');
     await defaultPage.evaluate(() => {
-        let showPriceDiv = document.querySelector('.showPrice');
+        let showPriceDiv = document.querySelector('.contractPrice');
         showPriceDiv.addEventListener("DOMCharacterDataModified", function (_) {
             let price = showPriceDiv.innerText;
-            console.log({
+            // console.log gets overriden by Binance
+            // and it outputs nothing!!!
+            console.error({
                 tag: 'btc-price',
                 value: price,
             })
