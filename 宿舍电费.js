@@ -121,3 +121,4 @@ let result = await finalPage.evaluate(() => {
     return Array.from(document.querySelectorAll('span')).filter(x => x.innerText === '剩余电量(度):')[0].parentElement.children[1].innerText;
 });
 console.log(result);
+await browser.close();
